@@ -1,41 +1,7 @@
-import moment from 'moment';
-import { _, partial, isString } from 'underscore';
+import { _, partial } from 'underscore';
 import { getColumnCleanName } from '../../services/query-result';
 import template from './table.html';
-
-function formatValue($filter, clientConfig, value, type) {
-  let formattedValue = value;
-  switch (type) {
-    case 'integer':
-      formattedValue = $filter('number')(value, 0);
-      break;
-    case 'float':
-      formattedValue = $filter('number')(value, 2);
-      break;
-    case 'boolean':
-      if (value !== undefined) {
-        formattedValue = String(value);
-      }
-      break;
-    case 'date':
-      if (value && moment.isMoment(value)) {
-        formattedValue = value.format(clientConfig.dateFormat);
-      }
-      break;
-    case 'datetime':
-      if (value && moment.isMoment(value)) {
-        formattedValue = value.format(clientConfig.dateTimeFormat);
-      }
-      break;
-    default:
-      if (isString(value)) {
-        formattedValue = $filter('linkify')(value);
-      }
-      break;
-  }
-
-  return formattedValue;
-}
+import formatValue from '../format-value';
 
 function GridRenderer(clientConfig) {
   return {

@@ -120,6 +120,7 @@ var config = {
     proxy: {
       '/login': {
         target: redashBackend + '/',
+        changeOrigin: true,
         secure: false
       },
       '/invite': {
@@ -128,30 +129,37 @@ var config = {
       },
       '/setup': {
         target: redashBackend + '/',
+        changeOrigin: true,
         secure: false
       },
       '/images': {
         target: redashBackend + '/',
+        changeOrigin: true,
         secure: false
       },
       '/js': {
         target: redashBackend + '/',
+        changeOrigin: true,
         secure: false
       },
       '/styles': {
         target: redashBackend + '/',
+        changeOrigin: true,
         secure: false
       },
       '/status.json': {
         target: redashBackend + '/',
+        changeOrigin: true,
         secure: false
       },
       '/api/admin': {
         target: redashBackend + '/',
+        changeOrigin: true,
         secure: false
       },
       '/api': {
         target: redashBackend,
+        changeOrigin: true,
         secure: false
       }
     }

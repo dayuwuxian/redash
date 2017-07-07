@@ -1,12 +1,46 @@
 import angular from 'angular';
 import $ from 'jquery';
+import moment from 'moment';
 import 'pivottable';
 import 'pivottable/dist/pivot.css';
-
 import editorTemplate from './pivottable-editor.html';
+import formatValue from '../format-value';
 
+function sortMoment(a, b) {
+  return a - b;
+}
 
-function pivotTableRenderer() {
+class MomentWrapper extends moment {
+  constructor(value, clientConfig, type) {
+    super(value);
+    this._type = type;
+    this._clientConfig = clientConfig;
+    this.toString = () => formatValue(null, this._clientConfig, this, type);
+  }
+}
+
+function buildData(queryResult, clientConfig) {
+  const sorters = {};
+  const data = angular.copy(queryResult.getData());
+  const columnTypes = queryResult.getColumns().reduce((types, col) => {
+    types[col.name] = col.type;
+    return types;
+  }, {});
+  data.forEach((item) => {
+    Object.entries(item).forEach(([key, value]) => {
+      if (value && moment.isMoment(value)) {
+        sorters[key] = sortMoment;
+        item[key] = new MomentWrapper(value, clientConfig, columnTypes[key]);
+      }
+    });
+  });
+  return {
+    data,
+    sorters,
+  };
+}
+
+function pivotTableRenderer(clientConfig) {
   return {
     restrict: 'E',
     scope: {
@@ -17,17 +51,14 @@ function pivotTableRenderer() {
     replace: false,
     link($scope, element) {
       function updatePivot() {
-        $scope.$watch('queryResult && queryResult.getData()', (data) => {
-          if (!data) {
-            return;
-          }
-
-          if ($scope.queryResult.getData() !== null) {
+        $scope.$watch('queryResult && queryResult.getData()', (newData) => {
+          if (newData !== null) {
             // We need to give the pivot table its own copy of the data, because it changes
             // it which interferes with other visualizations.
-            data = angular.copy($scope.queryResult.getData());
+            const { data, sorters } = buildData($scope.queryResult, clientConfig);
             const options = {
               renderers: $.pivotUtilities.renderers,
+              sorters: attr => sorters[attr],
               onRefresh(config) {
                 const configCopy = Object.assign({}, config);
                 // delete some values which are functions
@@ -50,7 +81,9 @@ function pivotTableRenderer() {
             $(element).pivotUI(data, options, true);
             if (options.controls && options.controls.enabled) {
               const controls = $('.pvtAxisContainer, .pvtRenderer, .pvtVals');
-              for (let i = 0; i < controls.length; i += 1) { controls[i].style.display = 'none'; }
+              for (let i = 0; i < controls.length; i += 1) {
+                controls[i].style.display = 'none';
+              }
             }
           }
         });

@@ -3,6 +3,7 @@ import $ from 'jquery';
 import moment from 'moment';
 import 'pivottable';
 import 'pivottable/dist/pivot.css';
+import './style.scss';
 import editorTemplate from './pivottable-editor.html';
 import formatValue from '../format-value';
 

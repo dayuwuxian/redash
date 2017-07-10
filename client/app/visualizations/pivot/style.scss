@@ -1,0 +1,15 @@
+table.pvtTable {
+  thead tr th, tbody tr th {
+    background-color: #fafafa;
+    border: 1px solid #f0f0f0;
+  }
+
+  tbody tr td {
+    border: 1px solid #f0f0f0;
+  }
+
+  .pvtAxisLabel {
+    font-size: 1.2em;
+    text-align: center;
+  }
+}
